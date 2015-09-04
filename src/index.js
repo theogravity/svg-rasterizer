@@ -12,6 +12,7 @@ const xtend = require('xtend')
 const promisify = require("es6-promisify")
 
 const copy = promisify(fs.copy)
+const remove = promisify(fs.remove)
 
 /**
  * - creates a temporary staging directory for operations
@@ -52,9 +53,9 @@ export default class SVGRasterizer {
    * Directory for where temporary processed files go
    */
   createTmpDir() {
-    fs.ensureDir('tmp')
+    fs.ensureDir('svg-rasterizer-tmp')
 
-    this.tmpDir = tmp.dirSync({ template: process.cwd() + '/tmp/XXXXXX' }).name
+    this.tmpDir = tmp.dirSync({ template: process.cwd() + '/svg-rasterizer-tmp/XXXXXX' }).name
 
     fs.mkdirsSync(this.tmpDir)
 
@@ -152,7 +153,7 @@ export default class SVGRasterizer {
    */
   optimizeSVG(file) {
 
-    const tmpFile = tmp.tmpNameSync( { template: this.getTempDir() + '/XXXXXX.optimized.svg' })
+    const tmpFile = tmp.tmpNameSync( { template: this.getTempDir() + '/' + 'XXXXXX-opti-' + path.basename(file) })
 
     return new Promise((resolve, reject) => {
       fs.readFile(file, 'utf8', (err, data) => {
@@ -181,7 +182,7 @@ export default class SVGRasterizer {
    * @param file
    */
   optimizePNG(file) {
-    const tmpFile = tmp.tmpNameSync({ template: this.getTempDir() + '/XXXXXX.optimized.png' })
+    const tmpFile = tmp.tmpNameSync({ template: this.getTempDir() + '/' + 'XXXXXX-opti-' + path.basename(file) })
 
     return new Promise((resolve, reject) => {
       execFile(pngquant, [file, '--output', tmpFile], (err) => {
@@ -306,7 +307,7 @@ export default class SVGRasterizer {
       let ext = path.extname(srcFile)
       let outStr = []
       let filename =  outputFmt.filename.replace('{{filename}}', path.basename(srcFile, ext)) + '.' + outputFmt.format
-      let file = this.getTempDir() + '/' + filename
+      let file = tmp.tmpNameSync({ template: this.getTempDir() + '/' + 'XXXXXX-rast-' + filename })
       let distPath = this.generateDistPath(path.dirname(srcFile), true) + '/' + filename
 
       outStr.push(outputFmt.format)
@@ -383,18 +384,34 @@ export default class SVGRasterizer {
     return stagedCfg
   }
 
+  cleanup() {
+    if (!this.config.debug) {
+      return remove(process.cwd() + '/svg-rasterizer-tmp')
+    }
+
+    return new Promise((resolve) => { resolve() })
+  }
+
   process() {
 
     return this.stageInputFiles().then(() => {
-      return this.processStagedInput().then( (files) => {
+      return this.processStagedInput().then((files) => {
         //flatten file structure
         return files.reduce((a, b) => {
           return a.concat(b)
         }, [])
       })
+    }).then((files) => {
+
+      return this.cleanup().then(() => {
+        return files
+      })
+
     }).catch((err) => {
-      this.log.error(err)
-      process.exit(-1)
+      this.cleanup().then(() => {
+        this.log.error(err)
+        process.exit(-1)
+      })
     })
   }
 }

@@ -7,7 +7,7 @@ const Rasterizer = require('../../src/index')
 
 const lstat = promisify(fs.lstat)
 
-fs.emptyDirSync('tmp')
+fs.emptyDirSync('svg-rasterizer-tmp')
 fs.emptyDirSync('dist')
 
 function checkExists(stats, file) {

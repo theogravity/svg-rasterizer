@@ -1,4 +1,4 @@
 src/
 !lib/
-tmp/
+svg-rasterizer-tmp/
 dist/

@@ -30,7 +30,11 @@ node_modules
 lib/
 
 # temporary scratch dir
-tmp/
+svg-rasterizer-tmp/
 
 # test dist dir
 dist/
+
+.idea/
+
+.DS_Store

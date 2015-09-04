@@ -53,7 +53,7 @@ module.exports = function(grunt) {
           // If true, include stack traces in failures.
           includeStackTrace: true,
           // Time to wait in milliseconds before a test automatically fails
-          defaultTimeoutInterval: 5000
+          defaultTimeoutInterval: 10000
         }
       }
     }
