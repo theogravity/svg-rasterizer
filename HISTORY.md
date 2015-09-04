@@ -1,3 +1,7 @@
+# 1.0.3 (2015-09-04)
+
+ * Fix scaling option not working in `svgexport`
+
 # 1.0.2 (2015-09-04)
 
  * Changed baseline loglevel to `info`

@@ -329,14 +329,14 @@ export default class SVGRasterizer {
       }
 
       if (outputFmt.styles) {
-        outStr.push(JSON.stringify(outputFmt.styles))
+        outStr.push('"' + JSON.stringify(outputFmt.styles) + '"')
       }
 
       svgCfg.push({
         tmp: file,
         dist: distPath,
         input: srcFile,
-        output: file + ' "' + outStr.join(' ') + '"',
+        output: file + ' ' + outStr.join(' '),
         type: outputFmt.format
       })
 
@@ -353,6 +353,9 @@ export default class SVGRasterizer {
     const config = this.generateSVGExportOpt(srcFile)
 
     return new Promise((resolve, reject) => {
+
+      this.log.debug('executing svgexport', config)
+
       svgexport.render(config, (err) => {
         if (err) { reject(err) }
 
@@ -393,6 +396,8 @@ export default class SVGRasterizer {
   }
 
   process() {
+    let start = new Date()
+    this.log.info('Running rasterizer against ' + this.input.length + ' files...')
 
     return this.stageInputFiles().then(() => {
       return this.processStagedInput().then((files) => {
@@ -404,6 +409,8 @@ export default class SVGRasterizer {
     }).then((files) => {
 
       return this.cleanup().then(() => {
+        let finish = new Date()
+        this.log.info(files.length + ' files (' + (files.length - this.input.length) + ' new) transferred in ' + (finish.getTime() - start.getTime()) + " ms")
         return files
       })
 

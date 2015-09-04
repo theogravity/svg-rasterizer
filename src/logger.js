@@ -9,7 +9,7 @@ module.exports = function (section_name, opts) {
   var logOpts = {
     name: 'svg-rasterizer' + '/' + section_name,
     stream: formatOut,
-    level: 'error',
+    level: 'info',
     serializers: bunyan.stdSerializers
   }
 
