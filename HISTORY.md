@@ -1,3 +1,8 @@
+# 1.0.2 (2015-09-04)
+
+ * Changed baseline loglevel to `info`
+ * Added execution timer
+
 # 1.0.1 (2015-09-03)
  
  * Change the temp directory name from `tmp`
