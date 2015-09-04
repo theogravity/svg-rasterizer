@@ -1,3 +1,7 @@
+# 1.0.4 (2015-09-04)
+
+ * Added `cleanOutputDir` option to clean the output directory before execution
+
 # 1.0.3 (2015-09-04)
 
  * Fix scaling option not working in `svgexport`

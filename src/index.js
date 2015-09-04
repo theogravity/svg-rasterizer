@@ -71,9 +71,16 @@ export default class SVGRasterizer {
       this.distDir = config.outputDir
     }
 
+    this.log.info({ dist: this.distDir }, 'Output directory')
+
+    if (config.cleanOutputDir) {
+      fs.removeSync(this.distDir)
+      this.log.info('Output directory emptied for use')
+
+    }
+
     fs.mkdirsSync(this.distDir)
 
-    this.log.info({ dist: this.distDir }, 'Output directory')
 
   }
 

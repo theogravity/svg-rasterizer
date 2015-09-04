@@ -74,7 +74,9 @@ module.exports = {
   ],
   // Output directory - uses the directory structure of the input files
   // when generating output
-  outputDir: 'dist'
+  outputDir: 'dist',
+  // Cleans the output dir before running (default is false)
+  cleanOutputDir: false
 }
 
 ```

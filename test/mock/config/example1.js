@@ -38,5 +38,6 @@ module.exports = {
     'test/mock/data/**/*.svg',
     'test/mock/data/**/*.png'
   ],
+  cleanOutputDir: true,
   outputDir: 'dist'
 }
