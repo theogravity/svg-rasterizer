@@ -226,7 +226,7 @@ export default class SVGRasterizer {
             return Promise.all(copyOper)
           }))
         default:
-          operations.push(this.copyToDist(stagedFile.src, stagedFile.dist))
+          operations.push(this.copyToDist(stagedFile.staged, stagedFile.dist))
       }
     })
 

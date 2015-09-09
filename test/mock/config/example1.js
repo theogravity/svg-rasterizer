@@ -1,8 +1,9 @@
 module.exports = {
-  debug: false,
+  debug: true,
   svgOptimizer: {
     plugins: [
-      { removeViewBox: false }
+      { removeViewBox: false },
+      { removeComments: true }
     ]
   },
   outputFormats: [

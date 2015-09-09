@@ -57,7 +57,7 @@ describe('SVG rasterizer', () => {
 
         expect(files.length).toBe(7)
         expect(files[0].src).toContain('/test/mock/data/AJ_Digital_Camera.svg')
-        expect(files[0].staged).toContain('.optimized.svg')
+        expect(files[0].staged).toContain('-opti-AJ_Digital_Camera.svg')
         expect(files[0].dist).toContain('/dist/test/mock/data/AJ_Digital_Camera.svg')
         expect(files[0].type).toBe('svg')
 
@@ -84,7 +84,7 @@ describe('SVG rasterizer', () => {
 
   })
 
-  fdescribe('processing staged files to dist', () => {
+  describe('processing staged files to dist', () => {
     it('should generate optimized rasterizations from a staged svg file', (done) => {
       let r = new Rasterizer(require('../mock/config/example1.js'))
       r.stageInputFiles().then((files) => {
