@@ -1,3 +1,7 @@
+# 1.0.5 (2015-09-10)
+ 
+ * Fix issue where the optimized svgs were not being copied over to dist directory
+
 # 1.0.4 (2015-09-04)
 
  * Added `cleanOutputDir` option to clean the output directory before execution
