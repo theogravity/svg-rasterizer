@@ -1,3 +1,7 @@
+# 1.1.0 (2015-09-22)
+
+ * Add cache option, `cacheDir`
+
 # 1.0.5 (2015-09-10)
  
  * Fix issue where the optimized svgs were not being copied over to dist directory

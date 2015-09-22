@@ -1,6 +1,6 @@
 {
   "name": "svg-rasterizer",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "Create batched rasterizations of SVG files to other formats suitable for multiple device types.",
   "main": "lib/index.js",
   "scripts": {
@@ -31,6 +31,8 @@
     "es6-promisify": "^3.0.0",
     "fs-extra": "^0.24.0",
     "glob": "^5.0.14",
+    "json-hash": "^1.1.0",
+    "jsonfile": "^2.2.2",
     "pngquant-bin": "^3.0.0",
     "svgexport": "^0.2.5",
     "svgo": "^0.5.6",
