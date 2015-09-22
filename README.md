@@ -76,7 +76,10 @@ module.exports = {
   // when generating output
   outputDir: 'dist',
   // Cleans the output dir before running (default is false)
-  cleanOutputDir: false
+  cleanOutputDir: false,
+  // Directory containing cache metadata for faster build times
+  // set to null to disable caching
+  cacheDir: 'svg-rasterizer-cache'
 }
 
 ```

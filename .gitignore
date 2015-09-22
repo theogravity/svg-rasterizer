@@ -38,3 +38,6 @@ dist/
 .idea/
 
 .DS_Store
+
+#cache dir
+svg-rasterizer-cache/

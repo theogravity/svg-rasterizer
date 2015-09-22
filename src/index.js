@@ -9,7 +9,9 @@ const execFile = require('child_process').execFile
 const pngquant = require('pngquant-bin')
 const svgexport = require('svgexport')
 const xtend = require('xtend')
-const promisify = require("es6-promisify")
+const promisify = require('es6-promisify')
+const hash = require('json-hash')
+const jsonfile = require('jsonfile')
 
 const copy = promisify(fs.copy)
 const remove = promisify(fs.remove)
@@ -31,8 +33,15 @@ export default class SVGRasterizer {
     }
 
     this.config = config
+  }
 
-    this.input = SVGRasterizer.buildInputFileList(config.input)
+  init() {
+    this.createCacheDir()
+
+    this.cacheFile = null
+    this.cache = this.loadCache()
+
+    this.input = this.buildInputFileList(this.config.input)
 
     this.stagedFiles = []
 
@@ -44,9 +53,14 @@ export default class SVGRasterizer {
 
     this.createDistDir()
 
-    this.svgo = new SVGO(config.svgOptimizer)
-    
+    this.svgo = new SVGO(this.config.svgOptimizer)
 
+  }
+
+  createCacheDir() {
+    if (this.config.cacheDir) {
+      fs.ensureDir(this.config.cacheDir)
+    }
   }
 
   /**
@@ -56,8 +70,6 @@ export default class SVGRasterizer {
     fs.ensureDir('svg-rasterizer-tmp')
 
     this.tmpDir = tmp.dirSync({ template: process.cwd() + '/svg-rasterizer-tmp/XXXXXX' }).name
-
-    fs.mkdirsSync(this.tmpDir)
 
     this.log.info({ tmpDir: this.tmpDir }, 'Scratch directory')
   }
@@ -74,13 +86,13 @@ export default class SVGRasterizer {
     this.log.info({ dist: this.distDir }, 'Output directory')
 
     if (config.cleanOutputDir) {
+
       fs.removeSync(this.distDir)
       this.log.info('Output directory emptied for use')
 
     }
 
     fs.mkdirsSync(this.distDir)
-
 
   }
 
@@ -100,17 +112,89 @@ export default class SVGRasterizer {
     return path.extname(file).toLowerCase() === '.gif'
   }
 
-  static buildInputFileList(input) {
+  buildInputFileList(input) {
     var fileList = []
 
     input.forEach(function (file) {
       fileList = fileList.concat(glob.sync(file, { realpath: true, nodir: true }))
     })
 
-    // remove dupes
-    return fileList.filter(function (elem, pos) {
-      return fileList.indexOf(elem) === pos
+    // remove dupes and unmodified files
+    return fileList.filter((elem, pos) => {
+
+      if (fileList.indexOf(elem) === pos) {
+        if (this.config.cacheDir) {
+          return this.hasFileBeenModified(elem)
+        } else {
+          return true
+        }
+      } else {
+        // File is a dupe; filter out
+        return false
+      }
     })
+  }
+
+  /**
+   * Used to determine if a file should be processed again
+   * @param file
+   * @returns {boolean}
+   */
+  hasFileBeenModified(file) {
+    var fileStat = fs.statSync(file)
+
+    // If the file does not exist in the cache or the modtimes do not match, consider the file modified/new
+    if (!this.cache.files[file] || this.cache.files[file] && this.cache.files[file] !== fileStat.mtime.getTime()) {
+      this.cache.files[file] = fileStat.mtime.getTime()
+      return true
+    }
+
+    this.cache.files[file] = fileStat.mtime.getTime()
+    return false
+  }
+
+  /**
+   * Loads the cache which contains a list of files that were processed in prior runs.
+   * If the optimization or output formats configurations have changed, a new cache is created
+   * @returns {*}
+   */
+  loadCache() {
+
+    const currConfig = xtend(
+      this.config.outputFormats,
+      this.config.svgOptimizer
+    )
+
+    if (this.config.cacheDir) {
+      this.cacheFile = path.join(this.config.cacheDir, hash.digest(currConfig) + '.json')
+
+      // If the file exists, then load the cache data
+      // if not, then assume a new cache
+      try {
+        fs.statSync(this.cacheFile)
+
+        this.log.info('Using cache file', { file: this.cacheFile })
+
+        return jsonfile.readFileSync(this.cacheFile)
+      } catch(e) {
+        this.log.info('Using fresh cache', { file: this.cacheFile })
+
+      }
+    } else {
+      this.log.info('Cache is not being used. Set a cache with the \'cacheDir\' option.')
+    }
+
+    return {
+      files: {}
+    }
+  }
+
+  saveCache() {
+    if (this.config.cacheDir) {
+      this.log.debug('Writing cache file', { file: this.cacheFile })
+
+      jsonfile.writeFileSync(this.cacheFile, this.cache)
+    }
   }
 
   /**
@@ -404,6 +488,9 @@ export default class SVGRasterizer {
 
   process() {
     let start = new Date()
+
+    this.init()
+
     this.log.info('Running rasterizer against ' + this.input.length + ' files...')
 
     return this.stageInputFiles().then(() => {
@@ -417,7 +504,8 @@ export default class SVGRasterizer {
 
       return this.cleanup().then(() => {
         let finish = new Date()
-        this.log.info(files.length + ' files (' + (files.length - this.input.length) + ' new) transferred in ' + (finish.getTime() - start.getTime()) + " ms")
+        this.saveCache()
+        this.log.info(files.length + ' files transferred in ' + (finish.getTime() - start.getTime()) + " ms")
         return files
       })
 

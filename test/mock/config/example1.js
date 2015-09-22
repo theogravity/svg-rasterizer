@@ -40,5 +40,6 @@ module.exports = {
     'test/mock/data/**/*.png'
   ],
   cleanOutputDir: true,
-  outputDir: 'dist'
+  outputDir: 'dist',
+  cacheDir: null
 }

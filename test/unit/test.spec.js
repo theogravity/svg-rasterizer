@@ -17,13 +17,14 @@ function checkExists(stats, file) {
 describe('SVG rasterizer', () => {
 
   it('should build a list of input files', () => {
-    let files = Rasterizer.buildInputFileList(['test/mock/data/**/*'])
+    let r = new Rasterizer(require('../mock/config/example1.js'))
+    let files = r.buildInputFileList(['test/mock/data/**/*'])
     expect(files.length).toBe(7)
   })
 
   it('should optimize an SVG file', (done) => {
     let r = new Rasterizer(require('../mock/config/example1.js'))
-
+    r.init()
     r.optimizeSVG(process.cwd() + '/test/mock/data/facebook.svg').then((data) => {
       lstat(data.tmp).then((stats) => {
         checkExists(stats, data.tmp)
@@ -37,7 +38,7 @@ describe('SVG rasterizer', () => {
 
   it('should optimize a PNG file', (done) => {
     let r = new Rasterizer(require('../mock/config/example1.js'))
-
+    r.init()
     r.optimizePNG(process.cwd() + '/test/mock/data/pnggrad16rgb.png').then((data) => {
       lstat(data.tmp).then((stats) => {
         checkExists(stats, data.tmp)
@@ -53,6 +54,7 @@ describe('SVG rasterizer', () => {
 
     it('should have a manifest of staged files', (done) => {
       let r = new Rasterizer(require('../mock/config/example1.js'))
+      r.init()
       r.stageInputFiles().then((files) => {
 
         expect(files.length).toBe(7)
@@ -67,6 +69,7 @@ describe('SVG rasterizer', () => {
 
     it('should generate optimized copies of images into a temp directory', (done) => {
       let r = new Rasterizer(require('../mock/config/example1.js'))
+      r.init()
       r.stageInputFiles().then((files) => {
 
         let operations = []
@@ -87,6 +90,7 @@ describe('SVG rasterizer', () => {
   describe('processing staged files to dist', () => {
     it('should generate optimized rasterizations from a staged svg file', (done) => {
       let r = new Rasterizer(require('../mock/config/example1.js'))
+      r.init()
       r.stageInputFiles().then((files) => {
 
         r.processStagedSVG(files[0]).then((rasters) => {
@@ -108,6 +112,7 @@ describe('SVG rasterizer', () => {
 
     it('should copy a src file to dist', (done) => {
       let r = new Rasterizer(require('../mock/config/example1.js'))
+      r.init()
       r.stageInputFiles().then((files) => {
         r.copyToDist(files[0].staged, files[0].dist).then(() => {
           lstat(files[0].dist).then((stats) => {
@@ -136,5 +141,53 @@ describe('SVG rasterizer', () => {
       })
     })
 
+  })
+
+  fdescribe('caching', () => {
+    it('should write the cache', (done) => {
+      fs.removeSync('svg-rasterizer-cache')
+
+      let r = new Rasterizer(require('../mock/config/cached.js'))
+
+      r.process().then((files) => {
+
+        expect(files.length).toBe(19)
+        done()
+      }, done.fail)
+    })
+
+    it('should not process any files that are cached', (done) => {
+      let r = new Rasterizer(require('../mock/config/cached.js'))
+
+      r.process().then((files) => {
+
+        expect(files.length).toBe(0)
+        done()
+      }, done.fail)
+    })
+
+    it('should not process any files that are cached', (done) => {
+      let r = new Rasterizer(require('../mock/config/cached.js'))
+
+      r.process().then((files) => {
+
+        expect(files.length).toBe(0)
+        done()
+      }, done.fail)
+    })
+
+    it('should process newly added files', (done) => {
+      let config = require('../mock/config/cached.js')
+
+      config.input.push('test/mock/cache-test.png')
+
+      let r = new Rasterizer(config)
+
+      r.process().then((files) => {
+
+        expect(files.length).toBe(1)
+        done()
+      }, done.fail)
+    })
   })
 })
