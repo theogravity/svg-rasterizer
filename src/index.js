@@ -59,7 +59,7 @@ export default class SVGRasterizer {
 
   createCacheDir() {
     if (this.config.cacheDir) {
-      fs.ensureDir(this.config.cacheDir)
+      fs.ensureDirSync(this.config.cacheDir)
     }
   }
 
@@ -67,7 +67,7 @@ export default class SVGRasterizer {
    * Directory for where temporary processed files go
    */
   createTmpDir() {
-    fs.ensureDir('svg-rasterizer-tmp')
+    fs.ensureDirSync('svg-rasterizer-tmp')
 
     this.tmpDir = tmp.dirSync({ template: process.cwd() + '/svg-rasterizer-tmp/XXXXXX' }).name
 
