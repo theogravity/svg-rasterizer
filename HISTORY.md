@@ -1,3 +1,7 @@
+# 1.1.1 (2015-09-25)
+
+ * https://github.com/theogravity/svg-rasterizer/pull/2 - fix issue where tmp directory may not be created on startup
+
 # 1.1.0 (2015-09-22)
 
  * Add cache option, `cacheDir`
