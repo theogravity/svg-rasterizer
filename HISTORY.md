@@ -1,3 +1,7 @@
+# 1.1.2 (2015-12-17)
+
+ * Update `svgo` and `svgexport` versions
+
 # 1.1.1 (2015-09-25)
 
  * https://github.com/theogravity/svg-rasterizer/pull/2 - fix issue where tmp directory may not be created on startup
