@@ -34,7 +34,7 @@
     "json-hash": "^1.1.0",
     "jsonfile": "^2.2.2",
     "pngquant-bin": "^3.0.0",
-    "svgexport": "^0.2.8",
+    "svgexport": "^0.3.0",
     "svgo": "^0.6.1",
     "tmp": "0.0.27",
     "xtend": "^4.0.0"
