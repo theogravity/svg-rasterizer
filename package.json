@@ -33,7 +33,7 @@
     "glob": "^5.0.14",
     "json-hash": "^1.1.0",
     "jsonfile": "^2.2.2",
-    "pngquant-bin": "^3.0.0",
+    "pngquant-bin": "^4.0.0",
     "svgexport": "^0.2.8",
     "svgo": "^0.6.1",
     "tmp": "0.0.27",
