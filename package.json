@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "grunt dev",
     "test": "grunt jasmine23",
-    "prepublish": "grunt dist"
+    "prepublish": "npm run snyk-protect && grunt dist",
+    "snyk-protect": "snyk protect"
   },
   "repository": {
     "type": "git",
@@ -37,7 +38,8 @@
     "svgexport": "^0.2.8",
     "svgo": "^0.6.1",
     "tmp": "0.0.27",
-    "xtend": "^4.0.0"
+    "xtend": "^4.0.0",
+    "snyk": "^1.316.1"
   },
   "devDependencies": {
     "babel": "^5.8.23",
@@ -52,5 +54,6 @@
     "grunt-eslint": "^17.1.0",
     "load-grunt-tasks": "^3.2.0",
     "minijasminenode23": "^1.1.0"
-  }
+  },
+  "snyk": true
 }
